@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肿瘤健康平台 - 用药追踪</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* 共用样式与dashboard.html相同，这里只展示新增或修改的部分 */
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50c8a8;
+            --dark-color: #2c3e50;
+            --light-color: #f5f7fa;
+            --danger-color: #e74c3c;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+        }
+
+        .top-navbar {
+            background-color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .content-area {
+            padding: 25px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            font-size: 24px;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .page-title p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            list-style: none;
+        }
+
+        .breadcrumb li {
+            margin-left: 10px;
+            font-size: 14px;
+        }
+
+        .breadcrumb li:not(:last-child)::after {
+            content: "/";
+            margin-left: 10px;
+            color: #999;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .health-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .summary-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            margin-right: 15px;
+        }
+
+        .summary-icon.blue {
+            background-color: var(--primary-color);
+        }
+
+        .summary-icon.green {
+            background-color: var(--secondary-color);
+        }
+
+        .summary-icon.orange {
+            background-color: #f39c12;
+        }
+
+        .summary-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .summary-change {
+            font-size: 12px;
+            color: #777;
+            display: flex;
+            align-items: center;
+        }
+
+        .summary-change.positive {
+            color: #27ae60;
+        }
+
+        .summary-change.negative {
+            color: var(--danger-color);
+        }
+
+        .health-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .health-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: #777;
+        }
+
+        .health-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .health-tab-content {
+            display: none;
+        }
+
+        .health-tab-content.active {
+            display: block;
+        }
+
+        .health-record {
+            display: flex;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: white;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            align-items: center;
+        }
+
+        .record-date {
+            width: 80px;
+            text-align: center;
+            margin-right: 15px;
+        }
+
+        .record-day {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .record-month {
+            font-size: 12px;
+            color: #777;
+            text-transform: uppercase;
+        }
+
+        .record-content {
+            flex: 1;
+        }
+
+        .record-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .record-description {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .record-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 15px;
+        }
+
+        .status-normal {
+            background-color: #e3f9e5;
+            color: #27ae60;
+        }
+
+        .status-warning {
+            background-color: #fff3e0;
+            color: #f39c12;
+        }
+
+        .status-danger {
+            background-color: #ffebee;
+            color: #e74c3c;
+        }
+
+        .add-record-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .add-record-btn:hover {
+            background-color: #3a7bd5;
+        }
+
+        .add-record-btn i {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <!-- 顶部导航栏 (与dashboard.html相同) -->
+        <div class="top-navbar">
+            <!-- 顶部导航内容 -->
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="content-area">
+            <div class="page-header">
+                <div class="page-title">
+                    <h2>用药追踪</h2>
+                    <p>记录和管理您的用药情况</p>
+                </div>
+                <ul class="breadcrumb">
+                    <li><a href="index.html">首页</a></li>
+                    <li>用药追踪</li>
+                </ul>
+            </div>
+
+            <!-- 用药概览 -->
+            <div class="health-summary">
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <div class="summary-icon blue">
+                            <i class="fas fa-pills"></i>
+                        </div>
+                        <div>
+                            <div class="summary-title">用药记录</div>
+                            <div class="summary-value">15</div>
+                            <div class="summary-change positive">
+                                <i class="fas fa-arrow-up"></i> 较上周增加 10%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <div class="summary-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <div class="summary-title">用药依从性</div>
+                            <div class="summary-value">90%</div>
+                            <div class="summary-change positive">
+                                <i class="fas fa-arrow-up"></i> 较上周提高 2%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用药记录标签页 -->
+            <div class="health-tabs">
+                <div class="health-tab active" data-tab="all">全部记录</div>
+                <div class="health-tab" data-tab="targeted">靶向药</div>
+                <div class="health-tab" data-tab="symptomatic">对症药</div>
+            </div>
+
+            <!-- 全部记录 -->
+            <div class="health-tab-content active" id="all-records">
+                <div class="health-record">
+                    <div class="record-date">
+                        <div class="record-day">15</div>
+                        <div class="record-month">6月</div>
+                    </div>
+                    <div class="record-content">
+                        <div class="record-title">服用靶向药</div>
+                        <div class="record-description">按时服用吉非替尼，无不良反应</div>
+                    </div>
+                    <div class="record-status status-normal">正常</div>
+                </div>
+
+                <div class="health-record">
+                    <div class="record-date">
+                        <div class="record-day">14</div>
+                        <div class="record-month">6月</div>
+                    </div>
+                    <div class="record-content">
+                        <div class="record-title">服用止吐药</div>
+                        <div class="record-description">按需服用昂丹司琼，效果良好</div>
+                    </div>
+                    <div class="record-status status-normal">正常</div>
+                </div>
+
+                <div class="add-record-btn" onclick="location.href='add-medication.html'">
+                    <i class="fas fa-plus"></i> 记录用药
+                </div>
+            </div>
+
+            <!-- 靶向药记录 -->
+            <div class="health-tab-content" id="targeted-records">
+                <div class="health-record">
+                    <div class="record-date">
+                        <div class="record-day">15</div>
+                        <div class="record-month">6月</div>
+                    </div>
+                    <div class="record-content">
+                        <div class="record-title">服用靶向药</div>
+                        <div class="record-description">按时服用吉非替尼，无不良反应</div>
+                    </div>
+                    <div class="record-status status-normal">正常</div>
+                </div>
+
+                <div class="add-record-btn" onclick="location.href='add-medication.html'">
+                    <i class="fas fa-plus"></i> 记录靶向药用药
+                </div>
+            </div>
+
+            <!-- 对症药记录 -->
+            <div class="health-tab-content" id="symptomatic-records">
+                <div class="health-record">
+                    <div class="record-date">
+                        <div class="record-day">14</div>
+                        <div class="record-month">6月</div>
+                    </div>
+                    <div class="record-content">
+                        <div class="record-title">服用止吐药</div>
+                        <div class="record-description">按需服用昂丹司琼，效果良好</div>
+                    </div>
+                    <div class="record-status status-normal">正常</div>
+                </div>
+
+                <div class="add-record-btn" onclick="location.href='add-medication.html'">
+                    <i class="fas fa-plus"></i> 记录对症药用药
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

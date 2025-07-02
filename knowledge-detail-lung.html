@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肿瘤健康平台 - 肺癌知识详情</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50c8a8;
+            --dark-color: #2c3e50;
+            --light-color: #f5f7fa;
+            --danger-color: #e74c3c;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-category {
+            color: #b3b3b3;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            color: #d1d1d1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: white;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item .badge {
+            margin-left: auto;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 10px;
+            padding: 3px 6px;
+            border-radius: 10px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+        }
+
+        .top-navbar {
+            background-color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .toggle-sidebar {
+            display: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f5;
+            border-radius: 20px;
+            padding: 8px 15px;
+            width: 300px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            padding: 5px;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-bar i {
+            color: #777;
+            margin-right: 5px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-icon,
+        .user-profile {
+            margin-left: 20px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-icon i {
+            font-size: 20px;
+            color: #555;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .content-area {
+            padding: 25px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            font-size: 24px;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .page-title p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            list-style: none;
+        }
+
+        .breadcrumb li {
+            margin-left: 10px;
+            font-size: 14px;
+        }
+
+        .breadcrumb li:not(:last-child)::after {
+            content: "/";
+            margin-left: 10px;
+            color: #999;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .knowledge-detail {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .knowledge-detail h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .knowledge-detail p {
+            color: #777;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .toggle-sidebar {
+                display: block;
+            }
+
+            .search-bar {
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="zhuanjia1.jpg" alt="用户头像">
+            <div>
+                <h3>张医生</h3>
+                <p>肿瘤科专家</p>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-category">主导航</div>
+            <a href="index.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </a>
+            <a href="patient-management.html" class="menu-item">
+                <i class="fas fa-user-injured"></i>
+                <span>患者管理</span>
+            </a>
+            <a href="data-visualization.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>数据可视化</span>
+            </a>
+            <a href="knowledge-base.html" class="menu-item">
+                <i class="fas fa-book"></i>
+                <span>肿瘤知识库</span>
+            </a>
+
+            <div class="menu-category">健康管理</div>
+            <a href="treatment-plans.html" class="menu-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>治疗方案</span>
+            </a>
+            <a href="medication-tracker.html" class="menu-item">
+                <i class="fas fa-pills"></i>
+                <span>用药追踪</span>
+            </a>
+            <a href="symptom-tracker.html" class="menu-item">
+                <i class="fas fa-thermometer-half"></i>
+                <span>症状追踪</span>
+            </a>
+
+            <div class="menu-category">社区支持</div>
+            <a href="patient-forum.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span>患者论坛</span>
+            </a>
+            <a href="support-groups.html" class="menu-item">
+                <i class="fas fa-hands-helping"></i>
+                <span>支持小组</span>
+            </a>
+
+            <div class="menu-category">系统设置</div>
+            <a href="profile-settings.html" class="menu-item">
+                <i class="fas fa-user-cog"></i>
+                <span>个人设置</span>
+            </a>
+            <a href="system-settings.html" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>系统设置</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <!-- 顶部导航栏 -->
+        <div class="top-navbar">
+            <div class="toggle-sidebar" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="搜索知识...">
+            </div>
+
+            <div class="user-actions">
+                <div class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-profile">
+                    <img src="zhuanjia1.jpg" alt="用户头像">
+                </div>
+            </div>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="content-area">
+            <div class="page-header">
+                <div class="page-title">
+                    <h2>肺癌知识详情</h2>
+                    <p>了解肺癌的详细信息</p>
+                </div>
+                <ul class="breadcrumb">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="knowledge-base.html">肿瘤知识库</a></li>
+                    <li>肺癌知识详情</li>
+                </ul>
+            </div>
+
+            <div class="knowledge-detail">
+                <h3>肺癌概述</h3>
+                <p>肺癌是最常见的肺部原发性恶性肿瘤，起源于支气管黏膜或腺体。根据组织学类型，肺癌主要分为小细胞肺癌和非小细胞肺癌，后者又包括腺癌、鳞癌等。</p>
+                <h3>症状</h3>
+                <p>早期肺癌可能没有明显症状，随着病情进展，可能出现咳嗽、咯血、胸痛、气短、发热等症状。部分患者还可能出现声音嘶哑、吞咽困难等症状。</p>
+                <h3>治疗方法</h3>
+                <p>肺癌的治疗方法主要包括手术治疗、化疗、放疗、靶向治疗和免疫治疗等。治疗方案的选择取决于肿瘤的分期、组织学类型、患者的身体状况等因素。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 切换侧边栏
+        document.getElementById('toggleSidebar').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

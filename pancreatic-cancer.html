@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肿瘤健康平台 - 胰腺癌知识详情</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .toggle-sidebar {
+            cursor: pointer;
+        }
+
+        .knowledge-detail p {
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen bg-gray-100">
+    <!-- 侧边栏 -->
+    <div class="sidebar fixed top-0 left-0 w-64 h-full bg-gray-900 text-white transform -translate-x-full md:translate-x-0"
+        id="sidebar">
+        <div class="p-6 flex items-center space-x-3">
+            <img src="zhuanjia1.jpg" alt="用户头像" class="w-10 h-10 rounded-full">
+            <div>
+                <h3 class="text-lg font-semibold">张医生</h3>
+                <p class="text-sm text-gray-400">肿瘤科专家</p>
+            </div>
+        </div>
+        <div class="px-6 py-4">
+            <div class="text-xs text-gray-400 uppercase mb-2">主导航</div>
+            <a href="index.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-home mr-3"></i>
+                <span>首页</span>
+            </a>
+            <a href="patient-management.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-user-injured mr-3"></i>
+                <span>患者管理</span>
+            </a>
+            <a href="data-visualization.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-chart-bar mr-3"></i>
+                <span>数据可视化</span>
+            </a>
+            <a href="knowledge-base.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-book mr-3"></i>
+                <span>肿瘤知识库</span>
+            </a>
+            <div class="text-xs text-gray-400 uppercase my-2">健康管理</div>
+            <a href="treatment-plans.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-clipboard-list mr-3"></i>
+                <span>治疗方案</span>
+            </a>
+            <a href="medication-tracker.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-pills mr-3"></i>
+                <span>用药追踪</span>
+            </a>
+            <a href="symptom-tracker.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-thermometer-half mr-3"></i>
+                <span>症状追踪</span>
+            </a>
+            <div class="text-xs text-gray-400 uppercase my-2">社区支持</div>
+            <a href="patient-forum.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-comments mr-3"></i>
+                <span>患者论坛</span>
+            </a>
+            <a href="support-groups.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-hands-helping mr-3"></i>
+                <span>支持小组</span>
+            </a>
+            <div class="text-xs text-gray-400 uppercase my-2">系统设置</div>
+            <a href="profile-settings.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-user-cog mr-3"></i>
+                <span>个人设置</span>
+            </a>
+            <a href="system-settings.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-cog mr-3"></i>
+                <span>系统设置</span>
+            </a>
+        </div>
+    </div>
+    <!-- 主内容区 -->
+    <div class="flex-1 ml-0 md:ml-64">
+        <!-- 顶部导航栏 -->
+        <div class="bg-white shadow-md px-6 py-4 flex items-center justify-between">
+            <div class="toggle-sidebar md:hidden" id="toggleSidebar">
+                <i class="fas fa-bars text-gray-600"></i>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center bg-gray-200 rounded-md px-3 py-1">
+                    <i class="fas fa-search text-gray-500"></i>
+                    <input type="text" placeholder="搜索知识..."
+                        class="bg-transparent border-none focus:outline-none ml-2">
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <i class="fas fa-bell text-gray-600"></i>
+                    <span
+                        class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                </div>
+                <img src="zhuanjia1.jpg" alt="用户头像" class="w-8 h-8 rounded-full">
+            </div>
+        </div>
+        <!-- 内容区域 -->
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">胰腺癌知识详情</h2>
+                    <p class="text-sm text-gray-600">了解胰腺癌的详细信息</p>
+                </div>
+                <ul class="flex text-sm text-gray-600">
+                    <li><a href="index.html" class="text-blue-500 hover:underline">首页</a></li>
+                    <li class="mx-2">/</li>
+                    <li><a href="knowledge-base.html" class="text-blue-500 hover:underline">肿瘤知识库</a></li>
+                    <li class="mx-2">/</li>
+                    <li>胰腺癌知识详情</li>
+                </ul>
+            </div>
+            <div class="bg-white p-6 rounded-md shadow-md">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">胰腺癌概述</h3>
+                <p class="text-gray-700 mb-4">胰腺癌是一种恶性程度很高，诊断和治疗都很困难的消化道恶性肿瘤，约90%为起源于腺管上皮的导管腺癌。其发病率和死亡率近年来明显上升。</p>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">症状</h3>
+                <p class="text-gray-700 mb-4">早期胰腺癌症状不典型，可能出现上腹部不适、隐痛、消化不良等症状。随着病情进展，会出现腹痛、黄疸、消瘦、乏力等症状。</p>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">治疗方法</h3>
+                <p class="text-gray-700 mb-4">胰腺癌的治疗以手术为主，包括胰十二指肠切除术、胰体尾切除术等。对于无法手术切除的患者，可采用化疗、放疗、靶向治疗等综合治疗方法。</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('toggleSidebar').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+
+</html>
+    

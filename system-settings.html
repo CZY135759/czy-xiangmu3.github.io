@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肿瘤健康平台 - 系统设置</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50c8a8;
+            --dark-color: #2c3e50;
+            --light-color: #f5f7fa;
+            --danger-color: #e74c3c;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .sidebar-header h3 {
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-category {
+            color: #b3b3b3;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            color: #d1d1d1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: white;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item .badge {
+            margin-left: auto;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 10px;
+            padding: 3px 6px;
+            border-radius: 10px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+        }
+
+        .top-navbar {
+            background-color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .toggle-sidebar {
+            display: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f5;
+            border-radius: 20px;
+            padding: 8px 15px;
+            width: 300px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            padding: 5px;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-bar i {
+            color: #777;
+            margin-right: 5px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-icon,
+        .user-profile {
+            margin-left: 20px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-icon i {
+            font-size: 20px;
+            color: #555;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .content-area {
+            padding: 25px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            font-size: 24px;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .page-title p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            list-style: none;
+        }
+
+        .breadcrumb li {
+            margin-left: 10px;
+            font-size: 14px;
+        }
+
+        .breadcrumb li:not(:last-child)::after {
+            content: "/";
+            margin-left: 10px;
+            color: #999;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .system-settings-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        .setting-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .setting-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        .save-settings-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .save-settings-btn:hover {
+            background-color: #3a7bd5;
+        }
+
+        /* 暗黑模式样式 */
+        body.dark-mode {
+            background-color: #121212;
+        }
+
+        body.dark-mode .sidebar {
+            background-color: #1e1e1e;
+        }
+
+        body.dark-mode .top-navbar {
+            background-color: #1e1e1e;
+            color: white;
+        }
+
+        body.dark-mode .search-bar {
+            background-color: #333;
+        }
+
+        body.dark-mode .search-bar input {
+            color: white;
+        }
+
+        body.dark-mode .search-bar i {
+            color: white;
+        }
+
+        body.dark-mode .notification-icon i {
+            color: white;
+        }
+
+        body.dark-mode .system-settings-container {
+            background-color: #1e1e1e;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="zhuanjia1.jpg" alt="用户头像">
+            <div>
+                <h3>张医生</h3>
+                <p>肿瘤科专家</p>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-category">主导航</div>
+            <a href="index.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </a>
+            <a href="health-tracker.html" class="menu-item">
+                <i class="fas fa-heartbeat"></i>
+                <span>健康追踪</span>
+            </a>
+            <a href="symptom-tracker.html" class="menu-item">
+                <i class="fas fa-stethoscope"></i>
+                <span>症状追踪</span>
+            </a>
+            <a href="treatment-plan.html" class="menu-item">
+                <i class="fas fa-prescription"></i>
+                <span>治疗方案</span>
+            </a>
+            <a href="data-visualization.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>数据可视化</span>
+            </a>
+            <a href="patient-forum.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span>患者论坛</span>
+            </a>
+            <a href="support-groups.html" class="menu-item">
+                <i class="fas fa-hands-helping"></i>
+                <span>支持小组</span>
+            </a>
+
+            <div class="menu-category">系统设置</div>
+            <a href="profile-settings.html" class="menu-item">
+                <i class="fas fa-user-cog"></i>
+                <span>个人设置</span>
+            </a>
+            <a href="system-settings.html" class="menu-item active">
+                <i class="fas fa-cog"></i>
+                <span>系统设置</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <!-- 顶部导航栏 -->
+        <div class="top-navbar">
+            <div class="toggle-sidebar" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="搜索支持小组...">
+            </div>
+
+            <div class="user-actions">
+                <div class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-profile">
+                    <img src="zhuanjia1.jpg" alt="用户头像">
+                </div>
+            </div>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="content-area">
+            <div class="page-header">
+                <div class="page-title">
+                    <h2>系统设置</h2>
+                    <p>管理系统的全局设置和偏好</p>
+                </div>
+                <ul class="breadcrumb">
+                    <li><a href="index.html">首页</a></li>
+                    <li>系统设置</li>
+                </ul>
+            </div>
+
+            <div class="system-settings-container">
+                <div class="setting-group">
+                    <label for="ui-theme">用户界面主题</label>
+                    <select id="ui-theme">
+                        <option value="light">明亮模式</option>
+                        <option value="dark">暗黑模式</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label for="notifications">通知设置</label>
+                    <div>
+                        <input type="checkbox" id="new-patient-notification" checked>
+                        <label for="new-patient-notification">新患者通知</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="report-completed-notification" checked>
+                        <label for="report-completed-notification">报告完成通知</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="message-notification" checked>
+                        <label for="message-notification">新消息通知</label>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label for="data-backup">数据备份与恢复</label>
+                    <button class="save-settings-btn">立即备份</button>
+                    <button class="save-settings-btn">恢复备份</button>
+                </div>
+                <button class="save-settings-btn" id="save-settings">保存设置</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 切换侧边栏
+        document.getElementById('toggleSidebar').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // 保存设置lder.com/3
+        document.getElementById('save-settings').addEventListener('click', function () {
+            const theme = document.getElementById('ui-theme').value;
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            // 这里可以添加保存其他设置的逻辑
+            alert('设置已保存');
+        });
+    </script>
+</body>
+
+</html>

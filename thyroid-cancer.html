@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肿瘤健康平台 - 甲状腺癌知识详情</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50c8a8;
+            --dark-color: #2c3e50;
+            --light-color: #f5f7fa;
+            --danger-color: #e74c3c;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-category {
+            color: #b3b3b3;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            color: #d1d1d1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: white;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item .badge {
+            margin-left: auto;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 10px;
+            padding: 3px 6px;
+            border-radius: 10px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+        }
+
+        .top-navbar {
+            background-color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .toggle-sidebar {
+            display: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f5;
+            border-radius: 20px;
+            padding: 8px 15px;
+            width: 300px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            padding: 5px;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-bar i {
+            color: #777;
+            margin-right: 5px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-icon,
+        .user-profile {
+            margin-left: 20px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-icon i {
+            font-size: 20px;
+            color: #555;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .content-area {
+            padding: 25px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            font-size: 24px;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .page-title p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            list-style: none;
+        }
+
+        .breadcrumb li {
+            margin-left: 10px;
+            font-size: 14px;
+        }
+
+        .breadcrumb li:not(:last-child)::after {
+            content: "/";
+            margin-left: 10px;
+            color: #999;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .knowledge-detail {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .knowledge-detail h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .knowledge-detail p {
+            color: #777;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .toggle-sidebar {
+                display: block;
+            }
+
+            .search-bar {
+                width: auto;
+            }
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen bg-gray-100">
+    <!-- 侧边栏 -->
+    <div class="sidebar fixed top-0 left-0 w-64 h-full bg-gray-900 text-white transform -translate-x-full md:translate-x-0"
+        id="sidebar">
+        <div class="p-6 flex items-center space-x-3">
+            <img src="zhuanjia1.jpg" alt="用户头像" class="w-10 h-10 rounded-full">
+            <div>
+                <h3 class="text-lg font-semibold">张医生</h3>
+                <p class="text-sm text-gray-400">肿瘤科专家</p>
+            </div>
+        </div>
+        <div class="px-6 py-4">
+            <div class="text-xs text-gray-400 uppercase mb-2">主导航</div>
+            <a href="index.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-home mr-3"></i>
+                <span>首页</span>
+            </a>
+            <a href="patient-management.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-user-injured mr-3"></i>
+                <span>患者管理</span>
+            </a>
+            <a href="data-visualization.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-chart-bar mr-3"></i>
+                <span>数据可视化</span>
+            </a>
+            <a href="knowledge-base.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-book mr-3"></i>
+                <span>肿瘤知识库</span>
+            </a>
+            <div class="text-xs text-gray-400 uppercase my-2">健康管理</div>
+            <a href="treatment-plans.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-clipboard-list mr-3"></i>
+                <span>治疗方案</span>
+            </a>
+            <a href="medication-tracker.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-pills mr-3"></i>
+                <span>用药追踪</span>
+            </a>
+            <a href="symptom-tracker.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-thermometer-half mr-3"></i>
+                <span>症状追踪</span>
+            </a>
+            <div class="text-xs text-gray-400 uppercase my-2">社区支持</div>
+            <a href="patient-forum.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-comments mr-3"></i>
+                <span>患者论坛</span>
+            </a>
+            <a href="support-groups.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-hands-helping mr-3"></i>
+                <span>支持小组</span>
+            </a>
+            <div class="text-xs text-gray-400 uppercase my-2">系统设置</div>
+            <a href="profile-settings.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-user-cog mr-3"></i>
+                <span>个人设置</span>
+            </a>
+            <a href="system-settings.html" class="menu-item flex items-center py-2 text-gray-300 hover:text-white">
+                <i class="fas fa-cog mr-3"></i>
+                <span>系统设置</span>
+            </a>
+        </div>
+    </div>
+    <!-- 主内容区 -->
+    <div class="flex-1 ml-0 md:ml-64">
+        <!-- 顶部导航栏 -->
+        <div class="bg-white shadow-md px-6 py-4 flex items-center justify-between">
+            <div class="toggle-sidebar md:hidden" id="toggleSidebar">
+                <i class="fas fa-bars text-gray-600"></i>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center bg-gray-200 rounded-md px-3 py-1">
+                    <i class="fas fa-search text-gray-500"></i>
+                    <input type="text" placeholder="搜索知识..."
+                        class="bg-transparent border-none focus:outline-none ml-2">
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <i class="fas fa-bell text-gray-600"></i>
+                    <span
+                        class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                </div>
+                <img src="zhuanjia1.jpg" alt="用户头像" class="w-8 h-8 rounded-full">
+            </div>
+        </div>
+        <!-- 内容区域 -->
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">甲状腺癌知识详情</h2>
+                    <p class="text-sm text-gray-600">了解甲状腺癌的详细信息</p>
+                </div>
+                <ul class="flex text-sm text-gray-600">
+                    <li><a href="index.html" class="text-blue-500 hover:underline">首页</a></li>
+                    <li class="mx-2">/</li>
+                    <li><a href="knowledge-base.html" class="text-blue-500 hover:underline">肿瘤知识库</a></li>
+                    <li class="mx-2">/</li>
+                    <li>甲状腺癌知识详情</li>
+                </ul>
+            </div>
+            <div class="bg-white p-6 rounded-md shadow-md">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">甲状腺癌概述</h3>
+                <p class="text-gray-700 mb-4">甲状腺癌是最常见的甲状腺恶性肿瘤，约占全身恶性肿瘤的1%，包括乳头状癌、滤泡状癌、髓样癌和未分化癌四种病理类型。其中乳头状癌最为常见，预后较好。</p>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">症状</h3>
+                <p class="text-gray-700 mb-4">早期甲状腺癌多无明显症状，常通过体检或超声检查发现颈部肿块。随着病情发展，可能出现颈部压迫感、声音嘶哑、吞咽困难等症状。</p>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">治疗方法</h3>
+                <p class="text-gray-700 mb-4">甲状腺癌的治疗主要包括手术治疗、放射性碘治疗、内分泌治疗等。手术是治疗甲状腺癌的主要方法，根据病情可选择甲状腺腺叶切除术、甲状腺全切除术等。</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('toggleSidebar').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+
+</html>
+    

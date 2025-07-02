@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肿瘤健康平台 - 治疗方案</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50c8a8;
+            --dark-color: #2c3e50;
+            --light-color: #f5f7fa;
+            --danger-color: #e74c3c;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .sidebar-header h3 {
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-category {
+            color: #b3b3b3;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            color: #d1d1d1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: white;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item .badge {
+            margin-left: auto;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 10px;
+            padding: 3px 6px;
+            border-radius: 10px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+        }
+
+        .top-navbar {
+            background-color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .toggle-sidebar {
+            display: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f5;
+            border-radius: 20px;
+            padding: 8px 15px;
+            width: 300px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            padding: 5px;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-bar i {
+            color: #777;
+            margin-right: 5px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-icon,
+        .user-profile {
+            margin-left: 20px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-icon i {
+            font-size: 20px;
+            color: #555;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .content-area {
+            padding: 25px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            font-size: 24px;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .page-title p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            list-style: none;
+        }
+
+        .breadcrumb li {
+            margin-left: 10px;
+            font-size: 14px;
+        }
+
+        .breadcrumb li:not(:last-child)::after {
+            content: "/";
+            margin-left: 10px;
+            color: #999;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .treatment-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .summary-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            margin-right: 15px;
+        }
+
+        .summary-icon.blue {
+            background-color: var(--primary-color);
+        }
+
+        .summary-icon.green {
+            background-color: var(--secondary-color);
+        }
+
+        .summary-icon.orange {
+            background-color: #f39c12;
+        }
+
+        .summary-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .summary-change {
+            font-size: 12px;
+            color: #777;
+            display: flex;
+            align-items: center;
+        }
+
+        .summary-change.positive {
+            color: #27ae60;
+        }
+
+        .summary-change.negative {
+            color: var(--danger-color);
+        }
+
+        .treatment-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .treatment-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: #777;
+        }
+
+        .treatment-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .treatment-tab-content {
+            display: none;
+        }
+
+        .treatment-tab-content.active {
+            display: block;
+        }
+
+        .treatment-record {
+            display: flex;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: white;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            align-items: center;
+        }
+
+        .record-date {
+            width: 80px;
+            text-align: center;
+            margin-right: 15px;
+        }
+
+        .record-day {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .record-month {
+            font-size: 12px;
+            color: #777;
+            text-transform: uppercase;
+        }
+
+        .record-content {
+            flex: 1;
+        }
+
+        .record-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .record-description {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .record-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 15px;
+        }
+
+        .status-normal {
+            background-color: #e3f9e5;
+            color: #27ae60;
+        }
+
+        .status-warning {
+            background-color: #fff3e0;
+            color: #f39c12;
+        }
+
+        .status-danger {
+            background-color: #ffebee;
+            color: #e74c3c;
+        }
+
+        .add-record-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .add-record-btn:hover {
+            background-color: #3a7bd5;
+        }
+
+        .add-record-btn i {
+            margin-right: 8px;
+        }
+
+        .treatment-chart-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            height: 350px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .toggle-sidebar {
+                display: block;
+            }
+
+            .search-bar {
+                width: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="zhuanjia1.jpg" alt="用户头像">
+            <div>
+                <h3>张医生</h3>
+                <p>肿瘤科专家</p>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-category">主导航</div>
+            <a href="index.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </a>
+            <a href="health-tracker.html" class="menu-item">
+                <i class="fas fa-heartbeat"></i>
+                <span>健康追踪</span>
+            </a>
+            <a href="symptom-tracker.html" class="menu-item">
+                <i class="fas fa-stethoscope"></i>
+                <span>症状追踪</span>
+            </a>
+            <a href="treatment-plan.html" class="menu-item active">
+                <i class="fas fa-prescription"></i>
+                <span>治疗方案</span>
+            </a>
+            <a href="data-visualization.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>数据可视化</span>
+            </a>
+            <a href="support-groups.html" class="menu-item">
+                <i class="fas fa-hands-helping"></i>
+                <span>支持小组</span>
+            </a>
+
+            <div class="menu-category">系统设置</div>
+            <a href="profile-settings.html" class="menu-item">
+                <i class="fas fa-user-cog"></i>
+                <span>个人设置</span>
+            </a>
+            <a href="system-settings.html" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>系统设置</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <!-- 顶部导航栏 -->
+        <div class="top-navbar">
+            <div class="toggle-sidebar" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="搜索患者、报告或文档...">
+            </div>
+
+            <div class="user-actions">
+                <div class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-profile">
+                    <img src="zhuanjia1.jpg" alt="用户头像">
+                </div>
+            </div>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="content-area">
+            <div class="page-header">
+                <div class="page-title">
+                    <h2>治疗方案</h2>
+                    <p>查看和管理您的治疗方案</p>
+                </div>
+                <ul class="breadcrumb">
+                    <li><a href="index.html">首页</a></li>
+                    <li>治疗方案</li>
+                </ul>
+            </div>
+
+            <!-- 治疗方案概览 -->
+            <div class="treatment-summary">
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <div class="summary-icon blue">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div>
+                            <div class="summary-title">治疗方案数量</div>
+                            <div class="summary-value">3</div>
+                            <div class="summary-change positive">
+                                <i class="fas fa-arrow-up"></i> 较上月增加 1
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <div class="summary-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <div class="summary-title">治疗完成率</div>
+                            <div class="summary-value">60%</div>
+                            <div class="summary-change positive">
+                                <i class="fas fa-arrow-up"></i> 较上周提高 5%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <div class="summary-icon orange">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div>
+                            <div class="summary-title">下次治疗时间</div>
+                            <div class="summary-value">2024-01-15</div>
+                            <div class="summary-change">
+                                距离下次治疗还有 10 天
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 治疗方案标签页 -->
+            <div class="treatment-tabs">
+                <div class="treatment-tab active" data-tab="all">全部方案</div>
+                <div class="treatment-tab" data-tab="chemotherapy">化疗方案</div>
+                <div class="treatment-tab" data-tab="targeted">靶向治疗方案</div>
+                <div class="treatment-tab" data-tab="radiation">放疗方案</div>
+            </div>
+
+            <!-- 全部方案 -->
+            <div class="treatment-tab-content active" id="all-plans">
+                <div class="treatment-record">
+                    <div class="record-date">
+                        <div class="record-day">10</div>
+                        <div class="record-month">1月</div>
+                    </div>
+                    <div class="record-content">
+                        <div class="record-title">化疗第 2 周期</div>
+                        <div class="record-description">使用顺铂和紫杉醇进行化疗，出现轻微恶心症状</div>
+                    </div>
+                    <div class="record-status status-warning">注意</div>
+                </div>
+
+                <div class="treatment-record">
+                    <div class="record-date">
+                        <div class="record-day">05</div>
+                        <div class="record-month">1月</div>
+                    </div>
+                    <div class="record-content">
+                        <div class="record-title">靶向治疗开始</div>
+                        <div class="record-description">开始服用吉非替尼，暂无不良反应</div>
+                    </div>
+                    <div class="record-status status-normal">正常</div>
+                </div>
+
+                <div class="treatment-record">
+                    <div class="record-date">
+                        <div class="record-day">01</div>
+                        <div class="record-month">1月</div>
+                    </div>
+                    <div class="record-content">
+                        <div class="record-title">放疗第 1 阶段</div>
+                        <div class="record-description">对肿瘤部位进行放疗，皮肤有轻微红肿</div>
+                    </div>
+                    <div class="record-status status-warning">注意</div>
+                </div>
+
+                <div class="add-record-btn" onclick="location.href='add-treatment-plan.html'">
+                    <i class="fas fa-plus"></i> 添加新方案
+                </div>
+            </div>
+
+            <!-- 化疗方案 -->
+            <div class="treatment-tab-content" id="chemotherapy-plans">
+                <div class="treatment-record">
+                    <div class="record-date">
+                        <div class="record-day">10</div>
+                        <div class="record-month">1月</div>
+                    </div>
+                    <div class="record-content">
+                        <div class="record-title">化疗第 2 周期</div>
+                        <div class="record-description">使用顺铂和紫杉醇进行化疗，出现轻微恶心症状</div>
+                    </div>
+                    <div class="record-status status-warning">注意</div>
+                </div>
+
+                <div class="add-record-btn" onclick="location.href='add-treatment-plan.html?type=chemotherapy'">
+                    <i class="fas fa-plus"></i> 添加化疗方案
+                </div>
+            </div>
+
+            <!-- 靶向治疗方案 -->
+            <div class="treatment-tab-content" id="targeted-plans">
+                <div class="treatment-record">
+                    <div class="record-date">
+                        <div class="record-day">05</div>
+                        <div class="record-month">1月</div>
+                    </div>
+                    <div class="record-content">
+                        <div class="record-title">靶向治疗开始</div>
+                        <div class="record-description">开始服用吉非替尼，暂无不良反应</div>
+                    </div>
+                    <div class="record-status status-normal">正常</div>
+                </div>
+
+                <div class="add-record-btn" onclick="location.href='add-treatment-plan.html?type=targeted'">
+                    <i class="fas fa-plus"></i> 添加靶向治疗方案
+                </div>
+            </div>
+
+            <!-- 放疗方案 -->
+            <div class="treatment-tab-content" id="radiation-plans">
+                <div class="treatment-record">
+                    <div class="record-date">
+                        <div class="record-day">01</div>
+                        <div class="record-month">1月</div>
+                    </div>
+                    <div class="record-content">
+                        <div class="record-title">放疗第 1 阶段</div>
+                        <div class="record-description">对肿瘤部位进行放疗，皮肤有轻微红肿</div>
+                    </div>
+                    <div class="record-status status-warning">注意</div>
+                </div>
+
+                <div class="add-record-btn" onclick="location.href='add-treatment-plan.html?type=radiation'">
+                    <i class="fas fa-plus"></i> 添加放疗方案
+                </div>
+            </div>
+
+            <!-- 治疗方案图表展示 -->
+            <div class="treatment-chart-container">
+                <canvas id="treatmentChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 侧边栏切换
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const sidebar = document.getElementById('sidebar');
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // 标签页切换
+        const tabs = document.querySelectorAll('.treatment-tab');
+        const tabContents = document.querySelectorAll('.treatment-tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`${targetTab}-plans`).classList.add('active');
+            });
+        });
+
+        // 初始化治疗方案图表
+        const treatmentCtx = document.getElementById('treatmentChart').getContext('2d');
+        const treatmentChart = new Chart(treatmentCtx, {
+            type: 'bar',
+            data: {
+                labels: ['化疗', '靶向治疗', '放疗'],
+                datasets: [{
+                    label: '治疗次数',
+                    data: [2, 1, 1],
+                    backgroundColor: [
+                        '#e74c3c',
+                        '#9b59b6',
+                        '#f39c12'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    </script>
+</body>
+
+</html>    

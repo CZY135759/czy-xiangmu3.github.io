@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肿瘤健康平台 - 症状追踪</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* 共用样式与dashboard.html相同，这里只展示新增或修改的部分 */
+        
+        .symptom-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .symptom-filter {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .symptom-filter select {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            outline: none;
+        }
+        
+        .add-symptom-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .add-symptom-btn:hover {
+            background-color: #3a7bd5;
+        }
+        
+        .symptom-chart-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            height: 350px;
+        }
+        
+        .symptom-list {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .symptom-item {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        
+        .symptom-item:last-child {
+            border-bottom: none;
+        }
+        
+        .symptom-name {
+            width: 150px;
+            font-weight: 600;
+        }
+        
+        .symptom-severity {
+            width: 100px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .severity-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .dot-mild {
+            background-color: #50c8a8;
+        }
+        
+        .dot-moderate {
+            background-color: #f39c12;
+        }
+        
+        .dot-severe {
+            background-color: #e74c3c;
+        }
+        
+        .symptom-frequency {
+            width: 120px;
+        }
+        
+        .symptom-date {
+            width: 100px;
+            color: #777;
+        }
+        
+        .symptom-notes {
+            flex: 1;
+            color: #777;
+            font-size: 14px;
+        }
+        
+        .symptom-actions {
+            width: 80px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .symptom-action {
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .common-symptoms {
+            margin-top: 30px;
+        }
+        
+        .common-title {
+            font-size: 18px;
+            color: var(--dark-color);
+            margin-bottom: 15px;
+        }
+        
+        .symptom-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .symptom-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .symptom-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .symptom-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .symptom-card-icon.blue {
+            background-color: var(--primary-color);
+        }
+        
+        .symptom-card-icon.red {
+            background-color: #e74c3c;
+        }
+        
+        .symptom-card-icon.orange {
+            background-color: #f39c12;
+        }
+        
+        .symptom-card-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .symptom-card-desc {
+            font-size: 13px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 (与dashboard.html相同) -->
+    <div class="sidebar" id="sidebar">
+        <!-- 侧边栏内容 -->
+        <a href="symptom-tracker.html" class="menu-item active">
+            <i class="fas fa-thermometer-half"></i>
+            <span>症状追踪</span>
+        </a>
+        <a href="data-import.html" class="menu-item">
+            <i class="fas fa-file-import"></i>
+            <span>数据导入</span>
+        </a>
+    </div>
+    
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <!-- 顶部导航栏 (与dashboard.html相同) -->
+        <div class="top-navbar">
+            <!-- 顶部导航内容 -->
+        </div>
+        
+        <!-- 内容区域 -->
+        <div class="content-area">
+            <div class="page-header">
+                <div class="page-title">
+                    <h2>症状追踪</h2>
+                    <p>记录和管理您的症状变化</p>
+                </div>
+                <ul class="breadcrumb">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="health-tracker.html">健康追踪</a></li>
+                    <li>症状追踪</li>
+                </ul>
+            </div>
+            
+            <div class="symptom-header">
+                <div class="symptom-filter">
+                    <select>
+                        <option>过去7天</option>
+                        <option selected>过去30天</option>
+                        <option>过去90天</option>
+                        <option>全部记录</option>
+                    </select>
+                    <select>
+                        <option>全部症状</option>
+                        <option>恶心呕吐</option>
+                        <option>疼痛</option>
+                        <option>疲劳</option>
+                        <option>发热</option>
+                        <option>其他</option>
+                    </select>
+                </div>
+                <button class="add-symptom-btn" onclick="location.href='add-symptom.html'">
+                    <i class="fas fa-plus"></i> 记录症状
+                </button>
+            </div>
+            
+            <div class="symptom-chart-container">
+                <canvas id="symptomChart"></canvas>
+            </div>
+            
+            <div class="symptom-list">
+                <div class="symptom-item">
+                    <div class="symptom-name">恶心</div>
+                    <div class="symptom-severity">
+                        <span class="severity-dot dot-moderate"></span>
+                        <span>中度</span>
+                    </div>
+                    <div class="symptom-frequency">每天1-2次</div>
+                    <div class="symptom-date">2023-06-13</div>
+                    <div class="symptom-notes">早餐后出现，持续约2小时，服用止吐药后缓解</div>
+                    <div class="symptom-actions">
+                        <i class="fas fa-edit symptom-action"></i>
+                        <i class="fas fa-trash symptom-action"></i>
+                    </div>
+                </div>
+                
+                <div class="symptom-item">
+                    <div class="symptom-name">发热</div>
+                    <div class="symptom-severity">
+                        <span class="severity-dot dot-severe"></span>
+                        <span>严重</span>
+                    </div>
+                    <div class="symptom-frequency">单次</div>
+                    <div class="symptom-date">2023-06-10</div>
+                    <div class="symptom-notes">体温38.5°C，服用退烧药后降至正常</div>
+                    <div class="symptom-actions">
+                        <i class="fas fa-edit symptom-action"></i>
+                        <i class="fas fa-trash symptom-action"></i>
+                    </div>
+                </div>
+                
+                <div class="symptom-item">
+                    <div class="symptom-name">疲劳</div>
+                    <div class="symptom-severity">
+                        <span class="severity-dot dot-moderate"></span>
+                        <span>中度</span>
+                    </div>
+                    <div class="symptom-frequency">持续</div>
+                    <div class="symptom-date">2023-06-08</div>
+                    <div class="symptom-notes">全天感到明显疲劳，午休2小时</div>
+                    <div class="symptom-actions">
+                        <i class="fas fa-edit symptom-action"></i>
+                        <i class="fas fa-trash symptom-action"></i>
+                    </div>
+                </div>
+                
+                <div class="symptom-item">
+                    <div class="symptom-name">食欲减退</div>
+                    <div class="symptom-severity">
+                        <span class="severity-dot dot-mild"></span>
+                        <span>轻度</span>
+                    </div>
+                    <div class="symptom-frequency">持续</div>
+                    <div class="symptom-date">2023-06-05</div>
+                    <div class="symptom-notes">食量减少约1/3，但能保证基本营养</div>
+                    <div class="symptom-actions">
+                        <i class="fas fa-edit symptom-action"></i>
+                        <i class="fas fa-trash symptom-action"></i>
+                    </div>
+                </div>
+                
+                <div class="symptom-item">
+                    <div class="symptom-name">头痛</div>
+                    <div class="symptom-severity">
+                        <span class="severity-dot dot-mild"></span>
+                        <span>轻度</span>
+                    </div>
+                    <div class="symptom-frequency">偶尔</div>
+                    <div class="symptom-date">2023-06-03</div>
+                    <div class="symptom-notes">轻微头痛，未服药自行缓解</div>
+                    <div class="symptom-actions">
+                        <i class="fas fa-edit symptom-action"></i>
+                        <i class="fas fa-trash symptom-action"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="common-symptoms">
+                <div class="common-title">常见症状快速记录</div>
+                <div class="symptom-cards">
+                    <div class="symptom-card" onclick="location.href='add-symptom.html?type=nausea'">
+                        <div class="symptom-card-icon red">
+                            <i class="fas fa-biohazard"></i>
+                        </div>
+                        <div class="symptom-card-title">恶心呕吐</div>
+                        <div class="symptom-card-desc">记录恶心呕吐的频率和严重程度</div>
+                    </div>
+                    
+                    <div class="symptom-card" onclick="location.href='add-symptom.html?type=pain'">
+                        <div class="symptom-card-icon orange">
+                            <i class="fas fa-bone"></i>
+                        </div>
+                        <div class="symptom-card-title">疼痛</div>
+                        <div class="symptom-card-desc">记录疼痛部位、程度和持续时间</div>
+                    </div>
+                    
+                    <div class="symptom-card" onclick="location.href='add-symptom.html?type=fatigue'">
+                        <div class="symptom-card-icon blue">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <div class="symptom-card-title">疲劳</div>
+                        <div class="symptom-card-desc">记录疲劳程度和对日常活动的影响</div>
+                    </div>
+                    
+                    <div class="symptom-card" onclick="location.href='add-symptom.html?type=fever'">
+                        <div class="symptom-card-icon red">
+                            <i class="fas fa-temperature-high"></i>
+                        </div>
+                        <div class="symptom-card-title">发热</div>
+                        <div class="symptom-card-desc">记录体温和伴随症状</div>
+                    </div>
+                    
+                    <div class="symptom-card" onclick="location.href='add-symptom.html?type=appetite'">
+                        <div class="symptom-card-icon orange">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="symptom-card-title">食欲变化</div>
+                        <div class="symptom-card-desc">记录食欲变化和体重波动</div>
+                    </div>
+                    
+                    <div class="symptom-card" onclick="location.href='add-symptom.html?type=other'">
+                        <div class="symptom-card-icon blue">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="symptom-card-title">其他症状</div>
+                        <div class="symptom-card-desc">记录任何其他不适症状</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 切换侧边栏
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+        
+        // 症状图表
+        const symptomCtx = document.getElementById('symptomChart').getContext('2d');
+        const symptomChart = new Chart(symptomCtx, {
+            type: 'line',
+            data: {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                datasets: [
+                    {
+                        label: '恶心呕吐',
+                        data: [3, 5, 8, 6, 7, 4],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: '疼痛',
+                        data: [2, 3, 5, 4, 6, 3],
+                        borderColor: '#f39c12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: '疲劳',
+                        data: [5, 6, 7, 5, 8, 6],
+                        borderColor: '#4a90e2',
+                        backgroundColor: 'rgba(74, 144, 226, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '症状发生次数'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

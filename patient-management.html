@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肿瘤健康平台 - 患者管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50c8a8;
+            --dark-color: #2c3e50;
+            --light-color: #f5f7fa;
+            --danger-color: #e74c3c;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .sidebar-header h3 {
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-category {
+            color: #b3b3b3;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            color: #d1d1d1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: white;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item .badge {
+            margin-left: auto;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 10px;
+            padding: 3px 6px;
+            border-radius: 10px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+        }
+
+        .top-navbar {
+            background-color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .toggle-sidebar {
+            display: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f5;
+            border-radius: 20px;
+            padding: 8px 15px;
+            width: 300px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            padding: 5px;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-bar i {
+            color: #777;
+            margin-right: 5px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-icon,
+        .user-profile {
+            margin-left: 20px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-icon i {
+            font-size: 20px;
+            color: #555;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .content-area {
+            padding: 25px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            font-size: 24px;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .page-title p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            list-style: none;
+        }
+
+        .breadcrumb li {
+            margin-left: 10px;
+            font-size: 14px;
+        }
+
+        .breadcrumb li:not(:last-child)::after {
+            content: "/";
+            margin-left: 10px;
+            color: #999;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .patient-list {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .patient-item {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+
+        .patient-item:last-child {
+            border-bottom: none;
+        }
+
+        .patient-name {
+            width: 150px;
+            font-weight: 600;
+        }
+
+        .patient-age {
+            width: 80px;
+        }
+
+        .patient-gender {
+            width: 80px;
+        }
+
+        .patient-status {
+            width: 100px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-active {
+            background-color: #e3f9e5;
+            color: #27ae60;
+        }
+
+        .status-inactive {
+            background-color: #ffebee;
+            color: #e74c3c;
+        }
+
+        .patient-actions {
+            width: 120px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .patient-action {
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .add-patient-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .add-patient-btn:hover {
+            background-color: #3a7bd5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 30%;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .form-btn:hover {
+            background-color: #3a7bd5;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .toggle-sidebar {
+                display: block;
+            }
+
+            .search-bar {
+                width: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="zhuanjia1.jpg" alt="用户头像">
+            <div>
+                <h3>张医生</h3>
+                <p>肿瘤科专家</p>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-category">主导航</div>
+            <a href="index.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </a>
+            <a href="patient-management.html" class="menu-item active">
+                <i class="fas fa-user-injured"></i>
+                <span>患者管理</span>
+            </a>
+            <a href="data-visualization.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>数据可视化</span>
+            </a>
+            <a href="knowledge-base.html" class="menu-item">
+                <i class="fas fa-book"></i>
+                <span>肿瘤知识库</span>
+            </a>
+
+            <div class="menu-category">健康管理</div>
+            <a href="treatment-plans.html" class="menu-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>治疗方案</span>
+            </a>
+            <a href="medication-tracker.html" class="menu-item">
+                <i class="fas fa-pills"></i>
+                <span>用药追踪</span>
+            </a>
+            <a href="symptom-tracker.html" class="menu-item">
+                <i class="fas fa-thermometer-half"></i>
+                <span>症状追踪</span>
+            </a>
+
+            <div class="menu-category">社区支持</div>
+            <a href="patient-forum.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span>患者论坛</span>
+            </a>
+            <a href="support-groups.html" class="menu-item">
+                <i class="fas fa-hands-helping"></i>
+                <span>支持小组</span>
+            </a>
+
+            <div class="menu-category">系统设置</div>
+            <a href="profile-settings.html" class="menu-item">
+                <i class="fas fa-user-cog"></i>
+                <span>个人设置</span>
+            </a>
+            <a href="system-settings.html" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>系统设置</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <!-- 顶部导航栏 -->
+        <div class="top-navbar">
+            <div class="toggle-sidebar" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="搜索患者...">
+            </div>
+
+            <div class="user-actions">
+                <div class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-profile">
+                    <img src="zhuanjia1.jpg" alt="用户头像">
+                </div>
+            </div>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="content-area">
+            <div class="page-header">
+                <div class="page-title">
+                    <h2>患者管理</h2>
+                    <p>管理所有患者的信息和状态</p>
+                </div>
+                <ul class="breadcrumb">
+                    <li><a href="index.html">首页</a></li>
+                    <li>患者管理</li>
+                </ul>
+            </div>
+
+            <button class="add-patient-btn" id="addPatientBtn">新增患者</button>
+
+            <div class="patient-list" id="patientList">
+                <div class="patient-item">
+                    <div class="patient-name">张三</div>
+                    <div class="patient-age">50</div>
+                    <div class="patient-gender">男</div>
+                    <div class="patient-status status-active">活跃</div>
+                    <div class="patient-actions">
+                        <div class="patient-action" onclick="editPatient(this)">编辑</div>
+                        <div class="patient-action" onclick="deletePatient(this)">删除</div>
+                    </div>
+                </div>
+                <div class="patient-item">
+                    <div class="patient-name">李四</div>
+                    <div class="patient-age">45</div>
+                    <div class="patient-gender">女</div>
+                    <div class="patient-status status-inactive">非活跃</div>
+                    <div class="patient-actions">
+                        <div class="patient-action" onclick="editPatient(this)">编辑</div>
+                        <div class="patient-action" onclick="deletePatient(this)">删除</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增患者模态框 -->
+    <div id="addPatientModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeAddModal">&times;</span>
+            <h2>新增患者</h2>
+            <form id="addPatientForm">
+                <div class="form-group">
+                    <label for="addName">姓名</label>
+                    <input type="text" id="addName" required>
+                </div>
+                <div class="form-group">
+                    <label for="addAge">年龄</label>
+                    <input type="number" id="addAge" required>
+                </div>
+                <div class="form-group">
+                    <label for="addGender">性别</label>
+                    <select id="addGender" required>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="addStatus">状态</label>
+                    <select id="addStatus" required>
+                        <option value="活跃">活跃</option>
+                        <option value="非活跃">非活跃</option>
+                    </select>
+                </div>
+                <button type="submit" class="form-btn">保存</button>
+                <button type="button" class="form-btn" id="cancelAddBtn">取消</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 编辑患者模态框 -->
+    <div id="editPatientModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeEditModal">&times;</span>
+            <h2>编辑患者信息</h2>
+            <form id="editPatientForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label for="editName">姓名</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editAge">年龄</label>
+                    <input type="number" id="editAge" required>
+                </div>
+                <div class="form-group">
+                    <label for="editGender">性别</label>
+                    <select id="editGender" required>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editStatus">状态</label>
+                    <select id="editStatus" required>
+                        <option value="活跃">活跃</option>
+                        <option value="非活跃">非活跃</option>
+                    </select>
+                </div>
+                <button type="submit" class="form-btn">保存</button>
+                <button type="button" class="form-btn" id="cancelEditBtn">取消</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const addPatientBtn = document.getElementById('addPatientBtn');
+        const addPatientModal = document.getElementById('addPatientModal');
+        const closeAddModal = document.getElementById('closeAddModal');
+        const cancelAddBtn = document.getElementById('cancelAddBtn');
+        const addPatientForm = document.getElementById('addPatientForm');
+        const patientList = document.getElementById('patientList');
+
+        const editPatientModal = document.getElementById('editPatientModal');
+        const closeEditModal = document.getElementById('closeEditModal');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const editPatientForm = document.getElementById('editPatientForm');
+
+        // 打开新增患者模态框
+        addPatientBtn.addEventListener('click', () => {
+            addPatientModal.style.display = 'block';
+        });
+
+        // 关闭新增患者模态框
+        closeAddModal.addEventListener('click', () => {
+            addPatientModal.style.display = 'none';
+        });
+
+        cancelAddBtn.addEventListener('click', () => {
+            addPatientModal.style.display = 'none';
+        });
+
+        // 新增患者
+        addPatientForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('addName').value;
+            const age = document.getElementById('addAge').value;
+            const gender = document.getElementById('addGender').value;
+            const status = document.getElementById('addStatus').value;
+
+            const newPatient = document.createElement('div');
+            newPatient.classList.add('patient-item');
+            newPatient.innerHTML = `
+                <div class="patient-name">${name}</div>
+                <div class="patient-age">${age}</div>
+                <div class="patient-gender">${gender}</div>
+                <div class="patient-status ${status === '活跃' ? 'status-active' : 'status-inactive'}">${status}</div>
+                <div class="patient-actions">
+                    <div class="patient-action" onclick="editPatient(this)">编辑</div>
+                    <div class="patient-action" onclick="deletePatient(this)">删除</div>
+                </div>
+            `;
+            patientList.appendChild(newPatient);
+            addPatientModal.style.display = 'none';
+            addPatientForm.reset();
+        });
+
+        // 编辑患者信息
+        window.editPatient = (button) => {
+            const patientItem = button.closest('.patient-item');
+            const name = patientItem.querySelector('.patient-name').textContent;
+            const age = patientItem.querySelector('.patient-age').textContent;
+            const gender = patientItem.querySelector('.patient-gender').textContent;
+            const status = patientItem.querySelector('.patient-status').textContent;
+
+            document.getElementById('editId').value = Array.from(patientList.children).indexOf(patientItem);
+            document.getElementById('editName').value = name;
+            document.getElementById('editAge').value = age;
+            document.getElementById('editGender').value = gender;
+            document.getElementById('editStatus').value = status;
+
+            editPatientModal.style.display = 'block';
+        };
+
+        // 关闭编辑患者模态框
+        closeEditModal.addEventListener('click', () => {
+            editPatientModal.style.display = 'none';
+        });
+
+        cancelEditBtn.addEventListener('click', () => {
+            editPatientModal.style.display = 'none';
+        });
+
+        // 保存编辑后的患者信息
+        editPatientForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const name = document.getElementById('editName').value;
+            const age = document.getElementById('editAge').value;
+            const gender = document.getElementById('editGender').value;
+            const status = document.getElementById('editStatus').value;
+
+            const patientItem = patientList.children[id];
+            patientItem.innerHTML = `
+                <div class="patient-name">${name}</div>
+                <div class="patient-age">${age}</div>
+                <div class="patient-gender">${gender}</div>
+                <div class="patient-status ${status === '活跃' ? 'status-active' : 'status-inactive'}">${status}</div>
+                <div class="patient-actions">
+                    <div class="patient-action" onclick="editPatient(this)">编辑</div>
+                    <div class="patient-action" onclick="deletePatient(this)">删除</div>
+                </div>
+            `;
+            editPatientModal.style.display = 'none';
+        });
+
+        // 删除患者
+        window.deletePatient = (button) => {
+            const patientItem = button.closest('.patient-item');
+            patientList.removeChild(patientItem);
+        };
+
+        // 切换侧边栏
+        document.getElementById('toggleSidebar').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+
+</html>    

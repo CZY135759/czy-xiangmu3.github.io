@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肿瘤健康平台 - 数据导入</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50c8a8;
+            --dark-color: #2c3e50;
+            --light-color: #f5f7fa;
+            --danger-color: #e74c3c;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+        }
+
+        .content-area {
+            padding: 25px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            font-size: 24px;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .page-title p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .import-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .import-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .import-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #eee;
+            z-index: 1;
+        }
+
+        .step {
+            position: relative;
+            z-index: 2;
+            background-color: white;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #eee;
+            color: #777;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 600;
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .step-title {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .step.active .step-title {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .import-section {
+            display: none;
+        }
+
+        .import-section.active {
+            display: block;
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+        }
+
+        .file-upload i {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        .file-upload-text {
+            color: #777;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-subtext {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .data-preview {
+            margin-top: 20px;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .preview-table th,
+        .preview-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .preview-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .import-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #3a7bd5;
+        }
+
+        .btn-secondary {
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e9ecef;
+        }
+
+        .import-progress {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background-color: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .import-success {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .import-success i {
+            font-size: 48px;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .import-success h3 {
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+
+        .import-success p {
+            color: #777;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar" id="sidebar">
+        <!-- 侧边栏内容与new-patient.html相同 -->
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <!-- 顶部导航栏 -->
+        <div class="top-navbar">
+            <!-- 顶部导航内容与new-patient.html相同 -->
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="content-area">
+            <div class="page-header">
+                <div class="page-title">
+                    <h2>数据导入</h2>
+                    <p>导入您的健康数据记录</p>
+                </div>
+                <ul class="breadcrumb">
+                    <li><a href="index.html">首页</a></li>
+                    <li>数据
+            </div>
+
+            <div class="import-container">
+                <div class="import-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-title">选择文件</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-title">数据预览</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-title">导入确认</div>
+                    </div>
+                </div>
+
+                <!-- 步骤1：选择文件 -->
+                <div class="import-section active" id="step1">
+                    <div class="file-upload" id="fileUpload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <div class="file-upload-text">点击或拖拽文件到此处上传</div>
+                        <div class="file-upload-subtext">支持 .csv, .xlsx 格式</div>
+                    </div>
+                    <input type="file" id="fileInput" accept=".csv,.xlsx" style="display: none;">
+                </div>
+
+                <!-- 步骤2：数据预览 -->
+                <div class="import-section" id="step2">
+                    <div class="data-preview">
+                        <h3>数据预览</h3>
+                        <div class="preview-table-container">
+                            <table class="preview-table">
+                                <thead>
+                                    <tr>
+                                        <th>日期</th>
+                                        <th>症状类型</th>
+                                        <th>严重程度</th>
+                                        <th>备注</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="previewTableBody">
+                                    <!-- 预览数据将通过JavaScript动态添加 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤3：导入确认 -->
+                <div class="import-section" id="step3">
+                    <div class="import-progress" id="importProgress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">正在导入数据...</div>
+                    </div>
+
+                    <div class="import-success" id="importSuccess">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>导入成功！</h3>
+                        <p>您的数据已成功导入系统</p>
+                        <button class="btn btn-primary" onclick="location.href='symptom-tracker.html'">查看数据</button>
+                    </div>
+                </div>
+
+                <div class="import-actions">
+                    <button class="btn btn-secondary" id="prevBtn" style="display: none;">上一步</button>
+                    <button class="btn btn-primary" id="nextBtn">下一步</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 文件上传处理
+        const fileUpload = document.getElementById('fileUpload');
+        const fileInput = document.getElementById('fileInput');
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const steps = document.querySelectorAll('.step');
+        const sections = document.querySelectorAll('.import-section');
+        let currentStep = 1;
+
+        // 点击上传区域触发文件选择
+        fileUpload.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // 拖拽文件处理
+        fileUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUpload.style.borderColor = 'var(--primary-color)';
+        });
+
+        fileUpload.addEventListener('dragleave', () => {
+            fileUpload.style.borderColor = '#ddd';
+        });
+
+        fileUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUpload.style.borderColor = '#ddd';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // 文件选择处理
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        // 处理选择的文件
+        function handleFile(file) {
+            // 这里添加文件处理逻辑
+            console.log('选择的文件:', file.name);
+            // 模拟数据预览
+            showPreviewData();
+            nextStep();
+        }
+
+        // 显示预览数据
+        function showPreviewData() {
+            const previewTableBody = document.getElementById('previewTableBody');
+            // 模拟数据
+            const previewData = [
+                { date: '2024-01-01', type: '恶心', severity: '中度', notes: '早餐后出现' },
+                { date: '2024-01-02', type: '疲劳', severity: '轻度', notes: '下午明显' },
+                { date: '2024-01-03', type: '发热', severity: '重度', notes: '体温38.5°C' }
+            ];
+
+            previewTableBody.innerHTML = previewData.map(row => `
+                <tr>
+                    <td>${row.date}</td>
+                    <td>${row.type}</td>
+                    <td>${row.severity}</td>
+                    <td>${row.notes}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 下一步按钮处理
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < 3) {
+                nextStep();
+            } else {
+                startImport();
+            }
+        });
+
+        // 上一步按钮处理
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                prevStep();
+            }
+        });
+
+        // 进入下一步
+        function nextStep() {
+            if (currentStep < 3) {
+                currentStep++;
+                updateSteps();
+            }
+        }
+
+        // 返回上一步
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateSteps();
+            }
+        }
+
+        // 更新步骤显示
+        function updateSteps() {
+            steps.forEach((step, index) => {
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+
+            sections.forEach((section, index) => {
+                if (index + 1 === currentStep) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+
+            // 更新按钮显示
+            prevBtn.style.display = currentStep > 1 ? 'block' : 'none';
+            nextBtn.textContent = currentStep === 3 ? '开始导入' : '下一步';
+        }
+
+        // 开始导入数据
+        function startImport() {
+            const importProgress = document.getElementById('importProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const importSuccess = document.getElementById('importSuccess');
+
+            importProgress.style.display = 'block';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+
+            // 模拟导入进度
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `正在导入数据... ${progress}%`;
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    importProgress.style.display = 'none';
+                    importSuccess.style.display = 'block';
+                }
+            }, 200);
+        }
+    </script>
+</body>
+</html>
